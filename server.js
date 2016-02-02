@@ -30,20 +30,36 @@ app.get('/hello', (req, res) => {
 
 });
 
-app.get('/random', (req, res) => {
-  res.status(200).send(Math.random().toString());
-});
-
 app.get('/random/:min/:max', (req, res) => {
   const mymin = req.params.min;
   const mymax = req.params.max;
   res.status(200).send((Math.floor(Math.random()*(mymax-mymin+1)+mymin)).toString());
 });
 
+app.get('/random', (req, res) => {
+  res.status(200).send(Math.random().toString());
+});
+
+app.get('/cal/:year/:month', (req, res) => {
+  const monthModule = require('node-cal/lib/month').joinOutput;
+  const year = req.params.year;
+  const month = parseInt(req.params.month);
+  res.status(200).send('<pre>'+monthModule(year, month, 'darwin').toString()+'</pre>');
+});
+
+app.get('/cal/:year', (req, res) => {
+  const yearModule = require('node-cal/lib/year').outputFullCal;
+  const year = req.params.year;
+  res.status(200).send('<pre>'+yearModule(year, 'darwin').toString()+'</pre>');
+});
+
 app.get('/cal', (req, res) => {
-  const monthModule = require('node-cal/lib/month');
-  const theCal = require('node-cal/cal');
-  console.log(theCal());
+  const monthModule = require('node-cal/lib/month').joinOutput;
+  let timeNow = new Date();
+  let month = timeNow.getMonth()+1;
+  let year = timeNow.getFullYear();
+
+  res.status(200).send('<pre>'+monthModule(year, month, 'darwin').toString()+'</pre>');
 });
 
 app.all('*', (req,res) => {
