@@ -3,7 +3,15 @@ const express = require('express');
 const app = express();
 // or const app = require('express')();
 
+app.set('view engine', 'jade');
 let PORT = process.env.PORT || 3000;
+
+app.get('/', (req, res) => {
+  res.render('index', {
+    title: 'Super Cool App',
+    date: new Date
+  });
+});
 
 app.get('/hello', (req, res) => {
   res.writeHead(200, {
