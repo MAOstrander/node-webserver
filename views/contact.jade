@@ -1,0 +1,17 @@
+extends ../templates/basic.jade
+
+block content
+  .container
+    h1 Contact
+    form(method='POST')
+      .form-group
+        label Name
+        input(type='text', name='name', placeholder='Name')
+      .form-group
+        label Email
+        input(type='email', name='email' placeholder='Email@domain.com')
+      .form-group
+        label Message
+        textarea(name='message' placeholder='Message')
+      .form-group
+        input(type='submit', value='Contact Us!')

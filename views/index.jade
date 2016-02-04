@@ -1,7 +1,13 @@
-doctype html
-html
-  head
-    title= title
-  body
-    h1 Welcome to my #{title}!
-    p The date is now #{date.toLocaleDateString()}
+extends ../templates/basic.jade
+
+block title
+  title= title
+  link(rel="stylesheet", href="./bower_components/font-awesome/css/font-awesome.min.css")
+  link(rel="stylesheet", href="./styles/test.css")
+
+block content
+  h1 Welcome to my #{title}!
+  p The date is now #{date.toLocaleDateString()}
+    p #{month}/#{year}
+  i.fa.fa-heart
+  pre= theCal

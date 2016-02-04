@@ -2,14 +2,56 @@
 const express = require('express');
 const app = express();
 // or const app = require('express')();
+const bodyParser = require('body-parser');
+var imgur = require('imgur');
+//FILE UPLOADING:  const upload = require('multer')({dest: 'tmp/uploads'}); or
+var multer  = require('multer');
+var storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'tmp/uploads')
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.fieldname + '-' + Date.now() + '.'+ fileExt(file))}
+})
+const fileExt = function(file) {
+  myFileName = file.fieldname + '-' + Date.now() + '.'+ file.mimetype.slice(6);
+  return file.mimetype.slice(6)
+}
 
+var upload = multer({ storage: storage })
+// UPLOADING FILES END
+const sassMiddleware = require('node-sass-middleware');
+
+var path = require('path');
 app.set('view engine', 'jade');
 let PORT = process.env.PORT || 3000;
 
+app.locals.title = `Mat's Super Cool App`;
+
+app.use(sassMiddleware({
+    /* Options */
+    src: path.join(__dirname, 'public'),
+    dest: path.join(__dirname, 'public'),
+    debug: true,
+    outputStyle: 'compressed',
+}));
+app.use(express.static(path.join(__dirname, 'public')));
+
+//app.use(bodyParser.urlencoded( {extended: false} ) );
+
+
 app.get('/', (req, res) => {
+  const monthModule = require('node-cal/lib/month').joinOutput;
+  let date = new Date();
+  let month = date.getMonth()+1;
+  let year = date.getFullYear();
+
   res.render('index', {
     title: 'Super Cool App',
-    date: new Date
+    theCal: monthModule(year, month, 'darwin').toString(),
+    date: date,
+    month: month,
+    year: year
   });
 });
 
@@ -36,6 +78,33 @@ app.get('/hello', (req, res) => {
     res.end('<h3>Goodbye</h3>');
   }, 20000);
 
+});
+
+app.get(`/contact`, (req, res) => {
+  res.render(`contact`);
+});
+
+app.post('/contact', (req, res) => {
+  const name = req.body.name;
+  res.send(`<h1>THANKS FOR CONTACTING SOMEONE ${name}!</h1>`);
+});
+
+app.get('/sendphoto', (req, res) => {
+  res.render('sendphoto');
+});
+var myFileName;
+app.post('/sendphoto', upload.single('image'), (req, res) => {
+
+  imgur.uploadFile(`tmp/uploads/${myFileName}`)
+    .then(function (json) {
+        console.log(json.data.link);
+    })
+    .catch(function (err) {
+        console.error(err.message);
+    });
+
+  console.log(req.body);
+  res.send(`<h1>We promise we won't do anything nefarious with it!</h1>`);
 });
 
 app.get('/random/:min/:max', (req, res) => {
@@ -70,7 +139,7 @@ app.get('/cal', (req, res) => {
   res.status(200).send('<pre>'+monthModule(year, month, 'darwin').toString()+'</pre>');
 });
 
-app.all('*', (req,res) => {
+app.all('/secret', (req,res) => {
   res.status(403).send('<h1>Access Denied</h1>');
 });
 
