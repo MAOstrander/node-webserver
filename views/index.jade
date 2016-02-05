@@ -5,9 +5,13 @@ block title
   link(rel="stylesheet", href="./bower_components/font-awesome/css/font-awesome.min.css")
   link(rel="stylesheet", href="./styles/test.css")
 
-block content
+block body
+
   h1 Welcome to my #{title}!
   p The date is now #{date.toLocaleDateString()}
     p #{month}/#{year}
   i.fa.fa-heart
   pre= theCal
+
+  script(src='bower_components/jquery/dist/jquery.min.js')
+  script(src='scripts/learning.js')

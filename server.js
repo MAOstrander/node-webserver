@@ -4,6 +4,9 @@ const app = express();
 // or const app = require('express')();
 const bodyParser = require('body-parser');
 var imgur = require('imgur');
+const _ = require('lodash');
+const request = require('request');
+const cheerio = require('cheerio');
 //FILE UPLOADING:  const upload = require('multer')({dest: 'tmp/uploads'}); or
 var multer  = require('multer');
 var storage = multer.diskStorage({
@@ -37,7 +40,8 @@ app.use(sassMiddleware({
 }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-//app.use(bodyParser.urlencoded( {extended: false} ) );
+app.use(bodyParser.urlencoded( {extended: false} ) );
+app.use(bodyParser.json() );
 
 
 app.get('/', (req, res) => {
@@ -52,6 +56,56 @@ app.get('/', (req, res) => {
     date: date,
     month: month,
     year: year
+  });
+});
+
+app.get('/api', (req, res) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.send({'Hey':'Worldu'});
+});
+
+app.post('/api', (req, res) => {
+  console.log(req.body);
+
+  const obj = _.mapValues(req.body, val => val.toUpperCase())
+
+  res.send(obj);
+});
+
+//playing with web scraping
+app.get('/api/news', (req, res) => {
+  const url = 'http://cnn.com';
+
+  request.get(url, (err, response, html) => {
+    if (err) throw err;
+
+    const news = [];
+    const $ = cheerio.load(html);
+
+    news.push({
+      title: $('.banner-text').text(),
+      url: `${url}${$('.banner-text').closest('a').attr('href')}`
+    });
+
+    _.range(1,12).forEach(i => {
+      news.push({
+        title: $('.cd__headline').eq(i).text(),
+        url: `${url}${$('.cd__headline').eq(i).find('a').attr('href')}`
+      });
+    });
+
+    res.send(news);
+  });
+});
+
+
+app.get('/api/weather', (req, res) => {
+  const url = 'https://api.forecast.io/forecast/b4ad2be4cd354044386a3efea6b15c18/37.8267,-122.423';
+  request.get(url, (err, response, body) => {
+    if (err) throw err;
+
+    res.header('Access-Control-Allow-Origin', '*');
+    res.send(JSON.parse(body));
   });
 });
 
@@ -98,13 +152,14 @@ app.post('/sendphoto', upload.single('image'), (req, res) => {
   imgur.uploadFile(`tmp/uploads/${myFileName}`)
     .then(function (json) {
         console.log(json.data.link);
+        res.end(`<h3><a href='${json.data.link}'>Your Image!</a></h3>`)
     })
     .catch(function (err) {
         console.error(err.message);
     });
 
   console.log(req.body);
-  res.send(`<h1>We promise we won't do anything nefarious with it!</h1>`);
+  res.write(`<h1>We promise we won't do anything nefarious with it!</h1>`);
 });
 
 app.get('/random/:min/:max', (req, res) => {
