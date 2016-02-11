@@ -7,6 +7,7 @@ var imgur = require('imgur');
 const _ = require('lodash');
 const request = require('request');
 const cheerio = require('cheerio');
+const fs = require('fs');
 //FILE UPLOADING:  const upload = require('multer')({dest: 'tmp/uploads'}); or
 var multer  = require('multer');
 var storage = multer.diskStorage({
@@ -25,9 +26,17 @@ var upload = multer({ storage: storage })
 // UPLOADING FILES END
 const sassMiddleware = require('node-sass-middleware');
 
+//connecting Mongo
+const MongoClient = require('mongodb').MongoClient
+let db;
+
+
 var path = require('path');
 app.set('view engine', 'jade');
 let PORT = process.env.PORT || 3000;
+
+//More mongo goodness
+const MONGO_URL = 'mongodb://localhost:27017/node-webserver';
 
 app.locals.title = `Mat's Super Cool App`;
 
@@ -68,6 +77,8 @@ app.post('/api', (req, res) => {
   console.log(req.body);
 
   const obj = _.mapValues(req.body, val => val.toUpperCase())
+
+  db.collection('')
 
   res.send(obj);
 });
@@ -153,6 +164,11 @@ app.post('/sendphoto', upload.single('image'), (req, res) => {
     .then(function (json) {
         console.log(json.data.link);
         res.end(`<h3><a href='${json.data.link}'>Your Image!</a></h3>`)
+
+        fs.unlink(`tmp/uploads/${myFileName}`, function(err) {
+            if (err) throw err;
+        });
+
     })
     .catch(function (err) {
         console.error(err.message);
@@ -199,6 +215,21 @@ app.all('/secret', (req,res) => {
 });
 
 
-app.listen(PORT, () => {
-  console.log(`Node.js server started. Listening on port ${PORT}`);
+MongoClient.connect(MONGO_URL, (err, datab) => {
+  if (err) throw err;
+
+  db = datab;
+
+  datab.collection('namegoeshere').insertMany([
+    {a: 'b'},{c: 'd'},{e: 'f'}
+  ], (err, res) => {
+    if (err) throw err;
+
+    console.log(res);
+  });
+
+
+  app.listen(PORT, () => {
+    console.log(`Node.js server started. Listening on port ${PORT}`);
+  });
 });
