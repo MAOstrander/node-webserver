@@ -5,31 +5,28 @@ const mongoose = require('mongoose');
 const MONGO_URL = 'mongodb://localhost:27017/node-webserver';
 const path = require('path');
 const sassMiddleware = require('node-sass-middleware');
+const PORT = process.env.PORT || 3000; // eslint-disable-line no-magic-numbers
 
-const routes = require('./routes/routes');
+const routes = require('./routes/');
 
-
-let PORT = process.env.PORT || 3000;
 app.set('view engine', 'jade');
 app.locals.title = `Mat's Super Cool App`;
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(sassMiddleware({
-    /* Options */
-    src: path.join(__dirname, 'public'),
-    dest: path.join(__dirname, 'public'),
-    debug: true,
-    outputStyle: 'compressed',
+  /* Options */
+  src: path.join(__dirname, 'public'),
+  dest: path.join(__dirname, 'public'),
+  debug: true,
+  outputStyle: 'compressed'
 }));
 
 app.use(routes);
 
 mongoose.connect(MONGO_URL);
 mongoose.connection.on('error', console.error.bind(console, 'connection error:'));
-mongoose.connection.once('open', function() {
-
+mongoose.connection.once('open', () => {
   app.listen(PORT, () => {
     console.log(`Node.js server started. Listening on port ${PORT}`);
   });
-
 });

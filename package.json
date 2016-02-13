@@ -20,6 +20,20 @@
     "url": "https://github.com/MAOstrander/node-webserver/issues"
   },
   "homepage": "https://github.com/MAOstrander/node-webserver#readme",
+  "eslintConfig": {
+    "env": {
+      "mocha": true,
+      "node": true,
+      "es6": true
+    },
+    "extends": [
+      "eslint:recommended",
+      "/Users/MAOstrander/.eslint/cohort-11.json"
+    ],
+    "rules": {
+      "no-console": 0
+    }
+  },
   "dependencies": {
     "body-parser": "^1.14.2",
     "cheerio": "^0.20.0",

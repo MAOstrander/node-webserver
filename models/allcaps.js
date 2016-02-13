@@ -2,8 +2,6 @@
 const mongoose = require('mongoose');
 
 module.exports = mongoose.model('allcaps',
-	mongoose.Schema(
-	  {},
-	  {strict: false}
+	mongoose.Schema( {}, {strict: false}
 	)
 );
