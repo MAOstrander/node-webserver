@@ -19,8 +19,8 @@ router.get('/', (req, res) => {
   News.findOne().sort('-_id').exec( (err, doc) => {
     if (err) throw err;
 
-    const topTitle = doc.top && doc.top[0].title || '';
-    const topUrl = doc.top && doc.top[0].url || '';
+    const topTitle = doc && doc.top && doc.top[0].title || '';
+    const topUrl = doc && doc.top && doc.top[0].url || '';
 
     const monthModule = require('node-cal/lib/month').joinOutput;
     const date = new Date();
