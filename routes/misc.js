@@ -6,13 +6,6 @@ const statusForbidden = 403;
 const briefPause = 1000 // In ms = 1 scec
 const longPause = 20000 // In ms = 20 sec
 
-// REQUIRE DANGER ZONE
-
-const bodyParser = require('body-parser');
-router.use(bodyParser.urlencoded( {extended: false} ) );
-router.use(bodyParser.json() );
-// END DANGER ZONE
-
 const News = require('../models/news');
 
 router.get('/', (req, res) => {
