@@ -38,7 +38,9 @@ app.use(routes);
 
 mongoose.connect(MONGO_URL);
 mongoose.connection.on('error', console.error.bind(console, 'connection error:'));
-mongoose.connection.once('open', () => {
+mongoose.connection.once('open', (err) => {
+  if (err) throw err;
+
   app.listen(PORT, () => {
     console.log(`Node.js server started. Listening on port ${PORT}`);
   });
